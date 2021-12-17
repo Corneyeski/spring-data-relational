@@ -42,7 +42,7 @@ import org.springframework.lang.Nullable;
 public interface DataAccessStrategy extends RelationResolver {
 
 	/**
-	 * Inserts the data of a single entity. Referenced entities don't get handled.
+	 * Inserts the data of a single aggregate..
 	 *
 	 * @param <T> the type of the instance.
 	 * @param instance the instance to be stored. Must not be {@code null}.

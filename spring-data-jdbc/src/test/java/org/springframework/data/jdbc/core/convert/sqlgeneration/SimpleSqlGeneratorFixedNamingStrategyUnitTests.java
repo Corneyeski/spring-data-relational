@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.jdbc.core.convert;
+package org.springframework.data.jdbc.core.convert.sqlgeneration;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -21,6 +21,9 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.jdbc.core.convert.BasicJdbcConverter;
+import org.springframework.data.jdbc.core.convert.JdbcConverter;
+import org.springframework.data.jdbc.core.convert.sqlgeneration.SimpleSqlGenerator;
 import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
 import org.springframework.data.jdbc.core.mapping.PersistentPropertyPathTestUtils;
 import org.springframework.data.relational.core.dialect.AnsiDialect;
@@ -31,13 +34,13 @@ import org.springframework.data.relational.core.mapping.RelationalPersistentEnti
 import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 
 /**
- * Unit tests the {@link SqlGenerator} with a fixed {@link NamingStrategy} implementation containing a hard wired
+ * Unit tests the {@link SimpleSqlGenerator} with a fixed {@link NamingStrategy} implementation containing a hard wired
  * schema, table, and property prefix.
  *
  * @author Greg Turnquist
  * @author Mark Paluch
  */
-public class SqlGeneratorFixedNamingStrategyUnitTests {
+public class SimpleSqlGeneratorFixedNamingStrategyUnitTests {
 
 	final NamingStrategy fixedCustomTablePrefixStrategy = new NamingStrategy() {
 
@@ -75,7 +78,7 @@ public class SqlGeneratorFixedNamingStrategyUnitTests {
 	@Test // DATAJDBC-107
 	public void findOneWithOverriddenFixedTableName() {
 
-		SqlGenerator sqlGenerator = configureSqlGenerator(fixedCustomTablePrefixStrategy);
+		SimpleSqlGenerator sqlGenerator = configureSqlGenerator(fixedCustomTablePrefixStrategy);
 
 		String sql = sqlGenerator.getFindOne();
 
@@ -98,7 +101,7 @@ public class SqlGeneratorFixedNamingStrategyUnitTests {
 	@Test // DATAJDBC-107
 	public void findOneWithUppercasedTablesAndLowercasedColumns() {
 
-		SqlGenerator sqlGenerator = configureSqlGenerator(upperCaseLowerCaseStrategy);
+		SimpleSqlGenerator sqlGenerator = configureSqlGenerator(upperCaseLowerCaseStrategy);
 
 		String sql = sqlGenerator.getFindOne();
 
@@ -117,7 +120,7 @@ public class SqlGeneratorFixedNamingStrategyUnitTests {
 	@Test // DATAJDBC-107
 	public void cascadingDeleteFirstLevel() {
 
-		SqlGenerator sqlGenerator = configureSqlGenerator(fixedCustomTablePrefixStrategy);
+		SimpleSqlGenerator sqlGenerator = configureSqlGenerator(fixedCustomTablePrefixStrategy);
 
 		String sql = sqlGenerator.createDeleteByPath(getPath("ref"));
 
@@ -128,7 +131,7 @@ public class SqlGeneratorFixedNamingStrategyUnitTests {
 	@Test // DATAJDBC-107
 	public void cascadingDeleteAllSecondLevel() {
 
-		SqlGenerator sqlGenerator = configureSqlGenerator(fixedCustomTablePrefixStrategy);
+		SimpleSqlGenerator sqlGenerator = configureSqlGenerator(fixedCustomTablePrefixStrategy);
 
 		String sql = sqlGenerator.createDeleteByPath(getPath("ref.further"));
 
@@ -143,7 +146,7 @@ public class SqlGeneratorFixedNamingStrategyUnitTests {
 	@Test // DATAJDBC-107
 	public void deleteAll() {
 
-		SqlGenerator sqlGenerator = configureSqlGenerator(fixedCustomTablePrefixStrategy);
+		SimpleSqlGenerator sqlGenerator = configureSqlGenerator(fixedCustomTablePrefixStrategy);
 
 		String sql = sqlGenerator.createDeleteAllSql(null);
 
@@ -153,7 +156,7 @@ public class SqlGeneratorFixedNamingStrategyUnitTests {
 	@Test // DATAJDBC-107
 	public void cascadingDeleteAllFirstLevel() {
 
-		SqlGenerator sqlGenerator = configureSqlGenerator(fixedCustomTablePrefixStrategy);
+		SimpleSqlGenerator sqlGenerator = configureSqlGenerator(fixedCustomTablePrefixStrategy);
 
 		String sql = sqlGenerator.createDeleteAllSql(getPath("ref"));
 
@@ -164,7 +167,7 @@ public class SqlGeneratorFixedNamingStrategyUnitTests {
 	@Test // DATAJDBC-107
 	public void cascadingDeleteSecondLevel() {
 
-		SqlGenerator sqlGenerator = configureSqlGenerator(fixedCustomTablePrefixStrategy);
+		SimpleSqlGenerator sqlGenerator = configureSqlGenerator(fixedCustomTablePrefixStrategy);
 
 		String sql = sqlGenerator.createDeleteAllSql(getPath("ref.further"));
 
@@ -179,7 +182,7 @@ public class SqlGeneratorFixedNamingStrategyUnitTests {
 	@Test // DATAJDBC-113
 	public void deleteByList() {
 
-		SqlGenerator sqlGenerator = configureSqlGenerator(fixedCustomTablePrefixStrategy);
+		SimpleSqlGenerator sqlGenerator = configureSqlGenerator(fixedCustomTablePrefixStrategy);
 
 		String sql = sqlGenerator.getDeleteByList();
 
@@ -194,14 +197,14 @@ public class SqlGeneratorFixedNamingStrategyUnitTests {
 	/**
 	 * Plug in a custom {@link NamingStrategy} for this test case.
 	 */
-	private SqlGenerator configureSqlGenerator(NamingStrategy namingStrategy) {
+	private SimpleSqlGenerator configureSqlGenerator(NamingStrategy namingStrategy) {
 
 		RelationalMappingContext context = new JdbcMappingContext(namingStrategy);
 		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
 			throw new UnsupportedOperationException();
 		});
 		RelationalPersistentEntity<?> persistentEntity = context.getRequiredPersistentEntity(DummyEntity.class);
-		return new SqlGenerator(context, converter, persistentEntity, AnsiDialect.INSTANCE);
+		return new SimpleSqlGenerator(context, converter, persistentEntity, AnsiDialect.INSTANCE);
 	}
 
 	@SuppressWarnings("unused")

@@ -15,7 +15,6 @@
  */
 package org.springframework.data.jdbc.core.convert;
 
-import static org.springframework.data.jdbc.core.convert.SqlGenerator.*;
 
 import java.sql.ResultSet;
 import java.util.Collections;
@@ -26,8 +25,12 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jdbc.core.convert.sqlgeneration.SingleQuerySqlGenerator;
+import org.springframework.data.jdbc.core.convert.sqlgeneration.SqlGenerator;
+import org.springframework.data.jdbc.core.convert.sqlgeneration.SqlGeneratorSource;
 import org.springframework.data.mapping.PersistentPropertyPath;
 import org.springframework.data.relational.core.conversion.IdValueSource;
+import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
@@ -40,6 +43,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+
+import static org.springframework.data.jdbc.core.convert.sqlgeneration.WritingSqlGenerator.*;
 
 /**
  * The default {@link DataAccessStrategy} is to generate SQL statements based on metadata from the entity.
@@ -273,7 +278,15 @@ public class DefaultDataAccessStrategy implements DataAccessStrategy {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> Iterable<T> findAll(Class<T> domainType) {
-		return operations.query(sql(domainType).getFindAll(), (RowMapper<T>) getEntityRowMapper(domainType));
+
+		Dialect dialect = sqlGeneratorSource.getDialect();
+		if (dialect.supportsSingleQueryLoad()) {
+			SingleQuerySqlGenerator sqlGenerator = new SingleQuerySqlGenerator(context,converter,context.getRequiredPersistentEntity(domainType),dialect);
+			String sql = sqlGenerator.getFindAll();
+			return operations.query(sql, new AggregateResultSetExtractor<>(context, getRequiredPersistentEntity(domainType), converter, p -> p.toDotPath()));// TODO the column function needs to be fixed
+		}
+
+		return operations.query(sql(domainType).getFindAll(), getEntityRowMapper(domainType));
 	}
 
 	@Override
@@ -333,10 +346,10 @@ public class DefaultDataAccessStrategy implements DataAccessStrategy {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> Iterable<T> findAll(Class<T> domainType, Pageable pageable) {
-		return operations.query(sql(domainType).getFindAll(pageable), (RowMapper<T>) getEntityRowMapper(domainType));
+		return operations.query(sql(domainType).getFindAll(pageable), getEntityRowMapper(domainType));
 	}
 
-	private EntityRowMapper<?> getEntityRowMapper(Class<?> domainType) {
+	private <T> EntityRowMapper<T> getEntityRowMapper(Class<T> domainType) {
 		return new EntityRowMapper<>(getRequiredPersistentEntity(domainType), converter);
 	}
 

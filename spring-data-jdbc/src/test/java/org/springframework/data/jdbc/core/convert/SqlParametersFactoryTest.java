@@ -35,6 +35,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
+import org.springframework.data.jdbc.core.convert.sqlgeneration.WritingSqlGenerator;
 import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
 import org.springframework.data.relational.core.conversion.IdValueSource;
 import org.springframework.data.relational.core.dialect.AnsiDialect;
@@ -63,7 +64,7 @@ class SqlParametersFactoryTest {
 
 		String rawId = "batman";
 		SqlIdentifierParameterSource sqlParameterSource = sqlParametersFactory.forQueryById(new IdValue(rawId),
-				WithValueObjectId.class, SqlGenerator.ID_SQL_PARAMETER);
+				WithValueObjectId.class, WritingSqlGenerator.ID_SQL_PARAMETER);
 
 		assertThat(sqlParameterSource.getValue("id")).isEqualTo(rawId);
 	}

@@ -75,7 +75,7 @@ public class Column extends AbstractSegment implements Expression, Named {
 	 * @return the new {@link Column}.
 	 * @since 2.0
 	 */
-	public static Column create(SqlIdentifier name, Table table) {
+	public static Column create(SqlIdentifier name, TableLike table) {
 
 		Assert.notNull(name, "Name must not be null");
 		Assert.notNull(table, "Table must not be null");

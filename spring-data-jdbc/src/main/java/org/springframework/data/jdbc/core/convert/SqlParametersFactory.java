@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import org.springframework.data.jdbc.core.convert.sqlgeneration.WritingSqlGenerator;
 import org.springframework.data.jdbc.core.mapping.JdbcValue;
 import org.springframework.data.jdbc.support.JdbcUtil;
 import org.springframework.data.mapping.PersistentProperty;
@@ -218,7 +219,7 @@ public class SqlParametersFactory {
 		SQLType jdbcType = jdbcValue.getJdbcType();
 		int typeNumber = jdbcType == null ? JdbcUtils.TYPE_UNKNOWN : jdbcType.getVendorTypeNumber();
 
-		parameterSource.addValue(SqlGenerator.IDS_SQL_PARAMETER, convertedIds, typeNumber);
+		parameterSource.addValue(WritingSqlGenerator.IDS_SQL_PARAMETER, convertedIds, typeNumber);
 	}
 
 	@SuppressWarnings("unchecked")

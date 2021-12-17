@@ -24,7 +24,7 @@ import org.springframework.util.Assert;
  * handle and the way elemnts should get separated when rendered.
  * 
  * @author Jens Schauder
- * @since 2.7
+ * @since 2.4
  */
 class SegmentListVisitor extends TypedSubtreeVisitor<SegmentList<?>> implements PartRenderer {
 

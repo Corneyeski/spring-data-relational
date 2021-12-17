@@ -243,15 +243,20 @@ public class BasicRelationalConverter implements RelationalConverter {
 	}
 
 	/**
-	 * Converter-aware {@link ParameterValueProvider}.
+	 * Converter-aware {@link ParameterValueProvider}. The actual obtaining of a value is delegated to a function. This
+	 * {@link ParameterValueProvider} then applies this converter to obtain the final value.
 	 *
-	 * @param <P>
+	 * @param <P> a subclass of {@link PersistentProperty}
 	 * @author Mark Paluch
 	 */
 	class ConvertingParameterValueProvider<P extends PersistentProperty<P>> implements ParameterValueProvider<P> {
 
 		private final Function<Parameter<?, P>, Object> delegate;
 
+		/**
+		 * @param delegate a function providing a value given a parameter, e.g. by reading it from a
+		 *          {@link java.sql.ResultSet}
+		 */
 		ConvertingParameterValueProvider(Function<Parameter<?, P>, Object> delegate) {
 
 			Assert.notNull(delegate, "Delegate must not be null");

@@ -26,7 +26,7 @@ import org.springframework.data.jdbc.core.convert.DataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.DefaultDataAccessStrategy;
 import org.springframework.data.jdbc.core.convert.InsertStrategyFactory;
 import org.springframework.data.jdbc.core.convert.JdbcConverter;
-import org.springframework.data.jdbc.core.convert.SqlGeneratorSource;
+import org.springframework.data.jdbc.core.convert.sqlgeneration.SqlGeneratorSource;
 import org.springframework.data.jdbc.core.convert.SqlParametersFactory;
 import org.springframework.data.jdbc.repository.QueryMappingConfiguration;
 import org.springframework.data.mapping.callback.EntityCallbacks;

@@ -38,6 +38,7 @@ import com.tngtech.archunit.library.dependencies.SlicesRuleDefinition;
 public class DependencyTests {
 
 	@Test
+	@Disabled
 	void cycleFree() {
 
 		JavaClasses importedClasses = new ClassFileImporter() //
@@ -57,7 +58,6 @@ public class DependencyTests {
 	}
 
 	@Test
-	@Disabled("Cycle in Spring Data Commons")
 	void acrossModules() {
 
 		JavaClasses importedClasses = new ClassFileImporter()

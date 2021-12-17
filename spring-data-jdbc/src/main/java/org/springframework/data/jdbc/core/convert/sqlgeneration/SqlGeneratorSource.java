@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.jdbc.core.convert;
+package org.springframework.data.jdbc.core.convert.sqlgeneration;
 
 import java.util.Map;
 
+import org.springframework.data.jdbc.core.convert.JdbcConverter;
 import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.util.Assert;
 import org.springframework.util.ConcurrentReferenceHashMap;
 
 /**
- * Provides {@link SqlGenerator}s per domain type. Instances get cached, so when asked multiple times for the same
+ * Provides {@link SimpleSqlGenerator}s per domain type. Instances get cached, so when asked multiple times for the same
  * domain type, the same generator will get returned.
  *
  * @author Jens Schauder
@@ -32,7 +33,7 @@ import org.springframework.util.ConcurrentReferenceHashMap;
  */
 public class SqlGeneratorSource {
 
-	private final Map<Class<?>, SqlGenerator> CACHE = new ConcurrentReferenceHashMap<>();
+	private final Map<Class<?>, SimpleSqlGenerator> CACHE = new ConcurrentReferenceHashMap<>();
 	private final RelationalMappingContext context;
 	private final JdbcConverter converter;
 	private final Dialect dialect;
@@ -49,16 +50,16 @@ public class SqlGeneratorSource {
 	}
 
 	/**
-	 * @return the {@link Dialect} used by the created {@link SqlGenerator} instances. Guaranteed to be not
+	 * @return the {@link Dialect} used by the created {@link SimpleSqlGenerator} instances. Guaranteed to be not
 	 *         {@literal null}.
 	 */
 	public Dialect getDialect() {
 		return dialect;
 	}
 
-	SqlGenerator getSqlGenerator(Class<?> domainType) {
+	public SqlGenerator getSqlGenerator(Class<?> domainType) {
 
 		return CACHE.computeIfAbsent(domainType,
-				t -> new SqlGenerator(context, converter, context.getRequiredPersistentEntity(t), dialect));
+				t -> new SimpleSqlGenerator(context, converter, context.getRequiredPersistentEntity(t), dialect));
 	}
 }

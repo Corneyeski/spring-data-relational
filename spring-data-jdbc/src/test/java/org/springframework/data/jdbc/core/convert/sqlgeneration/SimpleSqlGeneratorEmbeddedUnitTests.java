@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.jdbc.core.convert;
+package org.springframework.data.jdbc.core.convert.sqlgeneration;
 
 import static java.util.Collections.*;
 import static org.assertj.core.api.Assertions.*;
@@ -24,6 +24,10 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.jdbc.core.PropertyPathTestingUtils;
+import org.springframework.data.jdbc.core.convert.BasicJdbcConverter;
+import org.springframework.data.jdbc.core.convert.JdbcConverter;
+import org.springframework.data.jdbc.core.convert.NonQuotingDialect;
+import org.springframework.data.jdbc.core.convert.sqlgeneration.SimpleSqlGenerator;
 import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
@@ -36,17 +40,17 @@ import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.lang.Nullable;
 
 /**
- * Unit tests for the {@link SqlGenerator} in a context of the {@link Embedded} annotation.
+ * Unit tests for the {@link SimpleSqlGenerator} in a context of the {@link Embedded} annotation.
  *
  * @author Bastian Wilhelm
  */
-public class SqlGeneratorEmbeddedUnitTests {
+public class SimpleSqlGeneratorEmbeddedUnitTests {
 
 	private final RelationalMappingContext context = new JdbcMappingContext();
 	JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
 		throw new UnsupportedOperationException();
 	});
-	private SqlGenerator sqlGenerator;
+	private SimpleSqlGenerator sqlGenerator;
 
 	@BeforeEach
 	public void setUp() {
@@ -54,9 +58,9 @@ public class SqlGeneratorEmbeddedUnitTests {
 		this.sqlGenerator = createSqlGenerator(DummyEntity.class);
 	}
 
-	SqlGenerator createSqlGenerator(Class<?> type) {
+	SimpleSqlGenerator createSqlGenerator(Class<?> type) {
 		RelationalPersistentEntity<?> persistentEntity = context.getRequiredPersistentEntity(type);
-		return new SqlGenerator(context, converter, persistentEntity, NonQuotingDialect.INSTANCE);
+		return new SimpleSqlGenerator(context, converter, persistentEntity, NonQuotingDialect.INSTANCE);
 	}
 
 	@Test // DATAJDBC-111
@@ -193,7 +197,7 @@ public class SqlGeneratorEmbeddedUnitTests {
 	@Test // DATAJDBC-340
 	public void noJoinForEmbedded() {
 
-		SqlGenerator.Join join = generateJoin("embeddable", DummyEntity.class);
+		SimpleSqlGenerator.Join join = generateJoin("embeddable", DummyEntity.class);
 
 		assertThat(join).isNull();
 	}
@@ -224,7 +228,7 @@ public class SqlGeneratorEmbeddedUnitTests {
 	@Test // DATAJDBC-340
 	public void noJoinForPrefixedEmbedded() {
 
-		SqlGenerator.Join join = generateJoin("prefixedEmbeddable", DummyEntity.class);
+		SimpleSqlGenerator.Join join = generateJoin("prefixedEmbeddable", DummyEntity.class);
 
 		assertThat(join).isNull();
 	}
@@ -248,7 +252,7 @@ public class SqlGeneratorEmbeddedUnitTests {
 	@Test // DATAJDBC-340
 	public void noJoinForCascadedEmbedded() {
 
-		SqlGenerator.Join join = generateJoin("embeddable.embeddable", DummyEntity.class);
+		SimpleSqlGenerator.Join join = generateJoin("embeddable.embeddable", DummyEntity.class);
 
 		assertThat(join).isNull();
 	}
@@ -265,7 +269,7 @@ public class SqlGeneratorEmbeddedUnitTests {
 	@Test // DATAJDBC-340
 	public void joinForEmbeddedWithReference() {
 
-		SqlGenerator.Join join = generateJoin("embedded.other", DummyEntity2.class);
+		SimpleSqlGenerator.Join join = generateJoin("embedded.other", DummyEntity2.class);
 
 		assertSoftly(softly -> {
 
@@ -293,7 +297,7 @@ public class SqlGeneratorEmbeddedUnitTests {
 						SqlIdentifier.unquoted("prefix_other_value"));
 	}
 
-	private SqlGenerator.Join generateJoin(String path, Class<?> type) {
+	private SimpleSqlGenerator.Join generateJoin(String path, Class<?> type) {
 		return createSqlGenerator(type)
 				.getJoin(new PersistentPropertyPathExtension(context, PropertyPathTestingUtils.toPath(path, type, context)));
 	}

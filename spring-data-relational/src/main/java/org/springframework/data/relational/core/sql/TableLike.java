@@ -26,7 +26,7 @@ import org.springframework.util.Assert;
  * A segment that can be used as table in a query.
  *
  * @author Jens Schauder
- * @Since 2.3
+ * @since 2.3
  */
 public interface TableLike extends Segment {
 	/**
@@ -121,6 +121,7 @@ public interface TableLike extends Segment {
 		return columns;
 	}
 
+	// TODO: javadoc Formatierung
 	/**
 	 * Creates a {@link AsteriskFromTable} maker selecting all columns from this {@link Table} (e.g. {@code SELECT
 	 *

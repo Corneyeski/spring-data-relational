@@ -19,7 +19,7 @@ package org.springframework.data.relational.core.sql;
  * Represents an `ORDER BY` clause. Currently, only used in {@link AnalyticFunction}.
  *
  * @author Jens Schauder
- * @since 2.7
+ * @since 2.4
  */
 public class OrderBy extends SegmentList<OrderByField> {
 

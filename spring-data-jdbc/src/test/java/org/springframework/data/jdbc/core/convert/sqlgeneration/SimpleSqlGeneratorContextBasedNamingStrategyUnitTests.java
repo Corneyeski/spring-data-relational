@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.jdbc.core.convert;
+package org.springframework.data.jdbc.core.convert.sqlgeneration;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -26,6 +26,10 @@ import org.assertj.core.api.SoftAssertions;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.jdbc.core.convert.BasicJdbcConverter;
+import org.springframework.data.jdbc.core.convert.JdbcConverter;
+import org.springframework.data.jdbc.core.convert.NonQuotingDialect;
+import org.springframework.data.jdbc.core.convert.sqlgeneration.SimpleSqlGenerator;
 import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
 import org.springframework.data.jdbc.core.mapping.PersistentPropertyPathTestUtils;
 import org.springframework.data.mapping.PersistentPropertyPath;
@@ -36,12 +40,12 @@ import org.springframework.data.relational.core.mapping.RelationalPersistentProp
 
 /**
  * Unit tests to verify a contextual {@link NamingStrategy} implementation that customizes using a user-centric
- * {@link ThreadLocal}. NOTE: Due to the need to verify SQL generation and {@link SqlGenerator}'s package-private status
+ * {@link ThreadLocal}. NOTE: Due to the need to verify SQL generation and {@link SimpleSqlGenerator}'s package-private status
  * suggests this unit test exist in this package, not {@literal org.springframework.data.jdbc.mappings.model}.
  *
  * @author Greg Turnquist
  */
-public class SqlGeneratorContextBasedNamingStrategyUnitTests {
+public class SimpleSqlGeneratorContextBasedNamingStrategyUnitTests {
 
 	RelationalMappingContext context = new JdbcMappingContext();
 	ThreadLocal<String> userHandler = new ThreadLocal<>();
@@ -62,7 +66,7 @@ public class SqlGeneratorContextBasedNamingStrategyUnitTests {
 
 		testAgainstMultipleUsers(user -> {
 
-			SqlGenerator sqlGenerator = configureSqlGenerator(contextualNamingStrategy);
+			SimpleSqlGenerator sqlGenerator = configureSqlGenerator(contextualNamingStrategy);
 
 			String sql = sqlGenerator.getFindOne();
 
@@ -83,7 +87,7 @@ public class SqlGeneratorContextBasedNamingStrategyUnitTests {
 
 		testAgainstMultipleUsers(user -> {
 
-			SqlGenerator sqlGenerator = configureSqlGenerator(contextualNamingStrategy);
+			SimpleSqlGenerator sqlGenerator = configureSqlGenerator(contextualNamingStrategy);
 
 			String sql = sqlGenerator.createDeleteByPath(getPath("ref"));
 
@@ -100,7 +104,7 @@ public class SqlGeneratorContextBasedNamingStrategyUnitTests {
 
 		testAgainstMultipleUsers(user -> {
 
-			SqlGenerator sqlGenerator = configureSqlGenerator(contextualNamingStrategy);
+			SimpleSqlGenerator sqlGenerator = configureSqlGenerator(contextualNamingStrategy);
 
 			String sql = sqlGenerator.createDeleteByPath(getPath("ref.further"));
 
@@ -117,7 +121,7 @@ public class SqlGeneratorContextBasedNamingStrategyUnitTests {
 
 		testAgainstMultipleUsers(user -> {
 
-			SqlGenerator sqlGenerator = configureSqlGenerator(contextualNamingStrategy);
+			SimpleSqlGenerator sqlGenerator = configureSqlGenerator(contextualNamingStrategy);
 
 			String sql = sqlGenerator.createDeleteAllSql(null);
 
@@ -130,7 +134,7 @@ public class SqlGeneratorContextBasedNamingStrategyUnitTests {
 
 		testAgainstMultipleUsers(user -> {
 
-			SqlGenerator sqlGenerator = configureSqlGenerator(contextualNamingStrategy);
+			SimpleSqlGenerator sqlGenerator = configureSqlGenerator(contextualNamingStrategy);
 
 			String sql = sqlGenerator.createDeleteAllSql(getPath("ref"));
 
@@ -144,7 +148,7 @@ public class SqlGeneratorContextBasedNamingStrategyUnitTests {
 
 		testAgainstMultipleUsers(user -> {
 
-			SqlGenerator sqlGenerator = configureSqlGenerator(contextualNamingStrategy);
+			SimpleSqlGenerator sqlGenerator = configureSqlGenerator(contextualNamingStrategy);
 
 			String sql = sqlGenerator.createDeleteAllSql(getPath("ref.further"));
 
@@ -211,7 +215,7 @@ public class SqlGeneratorContextBasedNamingStrategyUnitTests {
 	/**
 	 * Plug in a custom {@link NamingStrategy} for this test case.
 	 */
-	private SqlGenerator configureSqlGenerator(NamingStrategy namingStrategy) {
+	private SimpleSqlGenerator configureSqlGenerator(NamingStrategy namingStrategy) {
 
 		RelationalMappingContext context = new JdbcMappingContext(namingStrategy);
 		JdbcConverter converter = new BasicJdbcConverter(context, (identifier, path) -> {
@@ -219,7 +223,7 @@ public class SqlGeneratorContextBasedNamingStrategyUnitTests {
 		});
 		RelationalPersistentEntity<?> persistentEntity = context.getRequiredPersistentEntity(DummyEntity.class);
 
-		return new SqlGenerator(context, converter, persistentEntity, NonQuotingDialect.INSTANCE);
+		return new SimpleSqlGenerator(context, converter, persistentEntity, NonQuotingDialect.INSTANCE);
 	}
 
 	@SuppressWarnings("unused")

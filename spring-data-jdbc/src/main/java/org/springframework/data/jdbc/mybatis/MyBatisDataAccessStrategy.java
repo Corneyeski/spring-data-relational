@@ -28,6 +28,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jdbc.core.convert.*;
+import org.springframework.data.jdbc.core.convert.sqlgeneration.SqlGeneratorSource;
 import org.springframework.data.mapping.PersistentPropertyPath;
 import org.springframework.data.mapping.PropertyPath;
 import org.springframework.data.relational.core.conversion.IdValueSource;

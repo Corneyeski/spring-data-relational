@@ -25,7 +25,7 @@ import org.springframework.lang.Nullable;
  * Renderer for {@link AnalyticFunction}. Uses a {@link RenderTarget} to call back for render results.
  *
  * @author Jens Schauder
- * @since 2.7
+ * @since 2.4
  */
 class AnalyticFunctionVisitor extends TypedSingleConditionRenderSupport<AnalyticFunction> implements PartRenderer {
 

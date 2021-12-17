@@ -33,6 +33,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.convert.CustomConversions;
 import org.springframework.data.jdbc.core.convert.*;
+import org.springframework.data.jdbc.core.convert.sqlgeneration.SqlGeneratorSource;
 import org.springframework.data.jdbc.core.convert.JdbcArrayColumns;
 import org.springframework.data.jdbc.core.dialect.JdbcDialect;
 import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;

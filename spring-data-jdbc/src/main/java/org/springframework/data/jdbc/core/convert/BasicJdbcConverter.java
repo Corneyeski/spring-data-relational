@@ -589,7 +589,7 @@ public class BasicJdbcConverter extends BasicRelationalConverter implements Jdbc
 			private final @Nullable Object idValue;
 			private final RelationalPersistentEntity<?> entity;
 
-			public ResultSetParameterValueProvider(@Nullable Object idValue, RelationalPersistentEntity<?> entity) {
+			ResultSetParameterValueProvider(@Nullable Object idValue, RelationalPersistentEntity<?> entity) {
 				this.idValue = idValue;
 				this.entity = entity;
 			}

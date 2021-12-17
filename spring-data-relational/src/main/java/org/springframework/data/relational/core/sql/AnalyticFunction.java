@@ -21,7 +21,7 @@ import java.util.Arrays;
  * Represents an analytic function, also known as windowing function
  * 
  * @author Jens Schauder
- * @since 2.7
+ * @since 2.4
  */
 public class AnalyticFunction extends AbstractSegment implements Expression {
 
