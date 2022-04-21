@@ -283,7 +283,17 @@ public class DefaultDataAccessStrategy implements DataAccessStrategy {
 		if (dialect.supportsSingleQueryLoad()) {
 			SingleQuerySqlGenerator sqlGenerator = new SingleQuerySqlGenerator(context,converter,context.getRequiredPersistentEntity(domainType),dialect);
 			String sql = sqlGenerator.getFindAll();
-			return operations.query(sql, new AggregateResultSetExtractor<>(context, getRequiredPersistentEntity(domainType), converter, p -> p.toDotPath()));// TODO the column function needs to be fixed
+			return operations.query(sql, new AggregateResultSetExtractor<>(context, getRequiredPersistentEntity(domainType), converter, new PathToColumnMapping() {
+				@Override
+				public String column(PersistentPropertyPath<RelationalPersistentProperty> propertyPath) {
+					return propertyPath.toDotPath();
+				}
+
+				@Override
+				public String keyColumn(PersistentPropertyPath<RelationalPersistentProperty> propertyPath) {
+					return propertyPath.toDotPath() + "_key";
+				}
+			}));// TODO the column function needs to be fixed
 		}
 
 		return operations.query(sql(domainType).getFindAll(), getEntityRowMapper(domainType));

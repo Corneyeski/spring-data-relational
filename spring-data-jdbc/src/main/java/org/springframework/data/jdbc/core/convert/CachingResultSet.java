@@ -15,6 +15,8 @@
  */
 package org.springframework.data.jdbc.core.convert;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.lang.Nullable;
 
 import java.sql.ResultSet;
@@ -23,6 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 class CachingResultSet {
+
+	private static final Log log = LogFactory.getLog(CachingResultSet.class);
 
 	public static final String UNSUPPORTED = "CachingResultSet does not implement this method. It is not intended as a full stand in of a ResultSet";
 	private final ResultSet delegate;
@@ -33,7 +37,7 @@ class CachingResultSet {
 		this.delegate = delegate;
 	}
 
-	public boolean next() throws SQLException {
+	public boolean next() {
 
 		if (isPeeking()) {
 
@@ -41,20 +45,25 @@ class CachingResultSet {
 			cache = null;
 			return next;
 		}
-		return delegate.next();
+
+		try {
+			return delegate.next();
+		} catch (SQLException e) {
+			throw new RuntimeException("Failed to advance CachingResultSet", e);
+		}
 	}
 
 	@Nullable
-	public Object getObject(String columnLabel) throws SQLException {
+	public Object getObject(String columnLabel)  {
 
 		if (isPeeking()) {
 			return cache.values.get(columnLabel);
 		}
-		return delegate.getObject(columnLabel);
+		return saveGetFromDelegate(columnLabel);
 	}
 
 	@Nullable
-	Object peek(String columnLabel) throws SQLException {
+	Object peek(String columnLabel)  {
 
 		if (!isPeeking()) {
 			createCache();
@@ -63,18 +72,36 @@ class CachingResultSet {
 		if (!cache.next) {
 			return null;
 		}
-		return delegate.getObject(columnLabel);
+
+		return saveGetFromDelegate(columnLabel);
 	}
 
-	private void createCache() throws SQLException {
+	@Nullable
+	private Object saveGetFromDelegate(String columnLabel) {
+		try {
+			return delegate.getObject(columnLabel);
+		} catch (SQLException e) {
+			if (log.isDebugEnabled()) {
+				log.debug("Failed to access column '" + columnLabel + "': " + e.getMessage());
+			}
+
+			return null;
+		}
+	}
+
+	private void createCache() {
 		cache = new Cache();
 
-		int columnCount = delegate.getMetaData().getColumnCount();
-		for (int i = 1; i <= columnCount; i++) {
-			cache.add(delegate.getMetaData().getColumnLabel(i), delegate.getObject(i));
-		}
+		try {
+			int columnCount = delegate.getMetaData().getColumnCount();
+			for (int i = 1; i <= columnCount; i++) {
+				cache.add(delegate.getMetaData().getColumnLabel(i), delegate.getObject(i));
+			}
 
-		cache.next = delegate.next();
+			cache.next = delegate.next();
+		} catch (SQLException se) {
+			throw new RuntimeException("Can't cache result set data", se);
+		}
 
 	}
 

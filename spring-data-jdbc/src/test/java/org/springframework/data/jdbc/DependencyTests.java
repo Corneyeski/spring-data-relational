@@ -67,13 +67,24 @@ public class DependencyTests {
 						"org.springframework.data.relational", // Spring Data Relational
 						"org.springframework.data" // Spring Data Commons
 				).that(onlySpringData()) //
-				.that(ignore(AuditingHandlerBeanDefinitionParser.class));
+				.that(ignore(AuditingHandlerBeanDefinitionParser.class))
+				.that(ignoreAotHints());
 
 		ArchRule rule = SlicesRuleDefinition.slices() //
 				.assignedFrom(subModuleSlicing()) //
 				.should().beFreeOfCycles();
 
 		rule.check(importedClasses);
+	}
+
+	private DescribedPredicate<? super JavaClass> ignoreAotHints() {
+		return new DescribedPredicate<JavaClass>("Not AOT hint") {
+			@Override
+			public boolean apply(JavaClass javaClass) {
+				final String packageName = javaClass.getPackageName();
+				return !(packageName.endsWith("aot.hint")|| packageName.endsWith("aot"));
+			}
+		};
 	}
 
 	@Test // GH-1058
